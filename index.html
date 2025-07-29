@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KBC Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: url('1200-12040822052114.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+    .game-container {
+      background: rgba(30, 30, 47, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      width: 600px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      display: none;
+      position: relative;
+    }
+    .question {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .option {
+      background-color: #333;
+      color: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .option:hover {
+      background-color: #555;
+    }
+    .correct {
+      background-color: green !important;
+    }
+    .wrong {
+      background-color: red !important;
+    }
+    .next-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #0066cc;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+    }
+    #startBtn, .player-btn {
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: gold;
+      color: black;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .lifelines {
+      margin-bottom: 15px;
+    }
+    .lifeline {
+      padding: 10px 15px;
+      margin: 0 5px;
+      background-color: #444;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .timer {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 18px;
+      color: yellow;
+    }
+    .phone-popup {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #222;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      display: none;
+      z-index: 10;
+    }
+    .phone-popup h3 {
+      margin-top: 0;
+    }
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 20px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<audio id="bgMusic">
+  <source src="kbc.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<div id="startScreen">
+  <button id="startBtn" onclick="showPlayerOptions()">Start Kon Banega Crorpati Game <br> (KBC) Rakshabandhan Version 🎬</button>
+</div>
+
+<div id="playerSelect" style="display:none; text-align:center;">
+  <h2>Choose Player</h2>
+  <button class="player-btn" onclick="startGame('shivani')">Shivani</button>
+  <button class="player-btn" onclick="startGame('jyoti')">Jyoti</button>
+  <button class="player-btn" onclick="startGame('nisha')">Nisha</button>
+</div>
+
+<div class="game-container" id="gameContainer">
+  <div class="timer" id="timer">60</div>
+  <button onclick="goBack()" style="position: absolute; top: 10px; left: 20px; font-size: 14px; padding: 5px 10px; background: #444; color: #fff; border: none; border-radius: 5px; cursor: pointer;">🔙 Back</button>
+
+  <div class="lifelines" id="lifelines">
+    <span class="lifeline" onclick="useFiftyFifty(this)">50:50</span>
+    <span class="lifeline" onclick="useAudiencePoll(this)">Audience Poll</span>
+    <span class="lifeline" onclick="usePhoneAFriend(this)">Phone a Friend</span>
+  </div>
+  <div class="question" id="question">Question text here</div>
+  <div class="options" id="options"></div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+</div>
+
+<div class="phone-popup" id="phonePopup">
+  <span class="close-btn" onclick="closePhonePopup()">&times;</span>
+  <h3>Call a Friend</h3>
+  <p>📞 Call any one for 60 seconds</p>
+</div>
+
+<script>
+const baseQuestions = [
+  {
+      question: "🎶 ओळखा गायक कोण आहे? (Guess the singer)",
+      options: ["Hemant Kumar", "Mukesh", "Kishore Kumar", "Mohamad Rafi"],
+      answer: 2,
+      audio: "ek-ladki.mp3"
+    }, 
+  {
+    question: "🖼️ Guess the movie using dialogue",
+    image: "jal-lijiye.jpg"
+  },  
+  {
+    question: "Tally मध्ये ‘Voucher’ म्हणजे काय?",
+    options: ["एखादी बँक", "खरेदीची यादी", "व्यवहाराची नोंद", "बँक पासबुक"],
+    answer: 2
+  },
+  {
+  question: "छत्रपती शिवाजी महाराजांचा जन्म कुठे झाला?",
+  options: ["शिवनेरी किल्ला", "राजगड किल्ला", "रायगड किल्ला", "प्रतापगड किल्ला"],
+  answer: 0
+},
+  { question: "How many players are there in a cricket team?", options: ["9", "10", "11", "12"], answer: 2 },
+  { question: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
+  { question: "Which is the largest animal on Earth?", options: ["Elephant", "Giraffe", "Blue Whale", "Shark"], answer: 2 }
+];
+
+const extraQuestionsJyoti = [
+  {
+    question: "🖼️ Guess the movie using dialogue",
+    image: "jor-jor-se-bolke-sabko-scheme-bata-de.jpg"
+  }, 
+  {
+    question: "🎶 ओळखा गायक कोण आहे? (Guess the singer)",
+    options: ["Kishore Kumar", "Mukesh", "Mohammad Rafi", "Shailendra Singh"],
+    answer: 2,
+    audio: "aasman.mp3"
+  },
+    {
+    question: "Special Marriage Act, 1954 नुसार विवाह नोंदणीसाठी किती दिवस पूर्वसूचना आवश्यक आहे?",
+    options: ["7 दिवस", "15 दिवस", "30 दिवस", "60 दिवस"],
+    answer: 2
+  },
+  {
+  question: "स्वराज्याची पहिली व दुसरी राजधानी कोणती होती?",
+  options: [
+    "शिवनेरी व रायगड",
+    "रायगड व प्रतापगड",
+    "राजगड व रायगड",
+    "तोरणा व राजगड"
+  ],
+  answer: 2
+},
+  { question: "What is the boiling point of water?", options: ["90°C", "80°C", "100°C", "120°C"], answer: 2 },
+  { question: "Which bird is known for its dance?", options: ["Peacock", "Crow", "Eagle", "Pigeon"], answer: 0 },
+  { question: "Taj Mahal is located in?", options: ["Delhi", "Agra", "Mumbai", "Jaipur"], answer: 1 }
+];
+
+const extraQuestionsNisha = [
+  {
+    question: "🖼️ Guess the movie using dialogue",
+    image: "shuru-hote-hi.jpg"
+  }, 
+   {
+    question: "🎶 ओळखा गायक कोण आहे? (Guess the singer)",
+    options: ["Sonu Nigam", "Kunal Ganjawala", "Javed Ali", "Krishnakumar Kunnath"],
+    answer: 3,
+    audio: "oh-lala-re.mp3"
+  },
+  {
+    question: "How many times will this Java code print the message?\nfor (int i = 0; i <= 3; i++) {\n    System.out.println(\"Happy Rakshabandhan\");\n}",
+    options: ["3 times", "4 times", "5 times", "Infinite loop"],
+    answer: 1
+  },
+  {
+  question: "छत्रपती शिवाजी महाराज आणि संभाजी महाराज यांची शेवटची भेट कोणत्या किल्ल्यावर झाली होती?",
+  options: ["रायगड", "पन्हाळा", "प्रतापगड", "सिंहगड"],
+  answer: 1
+},
+  {
+    question: "Which gas do plants absorb?",
+    options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+    answer: 2
+  }
+];
+
+let questions = [];
+let currentQuestion = 0;
+let timer;
+let timeLeft = 60;
+
+function goBack() {
+  clearInterval(timer);
+  document.getElementById("gameContainer").style.display = "none";
+  document.getElementById("playerSelect").style.display = "block";
+  currentQuestion = 0;
+  timeLeft = 60;
+}
+
+function showPlayerOptions() {
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("playerSelect").style.display = "block";
+  document.getElementById("bgMusic").play();
+}
+
+function startGame(player) {
+  document.getElementById("playerSelect").style.display = "none";
+  document.getElementById("gameContainer").style.display = "block";
+  document.getElementById("bgMusic").play();
+
+  if (player === "shivani") {
+    questions = [...baseQuestions];
+  } else if (player === "jyoti") {
+    questions = [...extraQuestionsJyoti];
+  } else if (player === "nisha") {
+    questions = [...extraQuestionsNisha];
+  }
+
+  loadQuestion();
+  startTimer();
+}
+
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  const questionDiv = document.getElementById("question");
+  const optionsDiv = document.getElementById("options");
+  const nextBtn = document.getElementById("nextBtn");
+
+  questionDiv.innerText = q.question;
+  optionsDiv.innerHTML = "";
+  nextBtn.style.display = "none";
+
+   if (q.image) {
+    const img = document.createElement("img");
+    img.src = q.image;
+    img.alt = "Movie dialogue image";
+    img.style.maxWidth = "100%";
+    img.style.borderRadius = "10px";
+    img.style.marginTop = "10px";
+    optionsDiv.appendChild(img);
+    nextBtn.style.display = "inline-block";
+    return;
+  }
+
+  if (q.audio) {
+    const audioPlayer = document.createElement("audio");
+    audioPlayer.src = q.audio;
+    audioPlayer.controls = true;
+    audioPlayer.style.marginBottom = "15px";
+    optionsDiv.appendChild(audioPlayer);
+
+    audioPlayer.addEventListener("ended", () => {
+      displayOptions(q, optionsDiv);
+    });
+  } else {
+    displayOptions(q, optionsDiv);
+  }
+
+  resetTimer();
+}
+
+function displayOptions(q, optionsDiv) {
+  q.options.forEach((opt, idx) => {
+    const div = document.createElement("div");
+    div.classList.add("option");
+    div.innerText = opt;
+    div.onclick = () => selectOption(div, idx);
+    optionsDiv.appendChild(div);
+  });
+}
+
+function selectOption(element, index) {
+  const correctIndex = questions[currentQuestion].answer;
+  const allOptions = document.querySelectorAll(".option");
+  allOptions.forEach(opt => opt.onclick = null);
+
+  if (index === correctIndex) {
+    element.classList.add("correct");
+  } else {
+    element.classList.add("wrong");
+    allOptions[correctIndex].classList.add("correct");
+  }
+
+  document.getElementById("nextBtn").style.display = "inline-block";
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    clearInterval(timer);
+    document.getElementById("gameContainer").innerHTML = "<h2>You've completed the quiz! 🎉</h2>";
+  }
+}
+
+function startTimer() {
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = timeLeft;
+    if (timeLeft <= 0) {
+      resetTimer();
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  timeLeft = 60;
+  document.getElementById("timer").innerText = timeLeft;
+}
+
+function useFiftyFifty(el) {
+  const correctIndex = questions[currentQuestion].answer;
+  const allOptions = document.querySelectorAll(".option");
+  let removed = 0;
+  for (let i = 0; i < allOptions.length; i++) {
+    if (i !== correctIndex && removed < 2) {
+      allOptions[i].style.display = "none";
+      removed++;
+    }
+  }
+  el.style.display = "none";
+}
+
+function useAudiencePoll(el) {
+  el.style.display = "none";
+}
+
+function usePhoneAFriend(el) {
+  document.getElementById("phonePopup").style.display = "block";
+  el.style.display = "none";
+}
+
+function closePhonePopup() {
+  document.getElementById("phonePopup").style.display = "none";
+}
+</script>
+
+</body>
+</html>
