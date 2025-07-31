@@ -121,6 +121,17 @@
   Your browser does not support the audio element.
 </audio>
 
+<audio id="correctSound">
+  <source src="correct.wav" type="audio/wav">
+  Your browser does not support the audio element.
+</audio>
+
+<audio id="wrongSound">
+  <source src="wrong.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+
 <div id="startScreen">
   <button id="startBtn" onclick="showPlayerOptions()">Start Kon Banega Crorpati Game <br> (KBC) Rakshabandhan Version 🎬</button>
 </div>
@@ -174,7 +185,21 @@ const baseQuestions = [
   options: ["शिवनेरी किल्ला", "राजगड किल्ला", "रायगड किल्ला", "प्रतापगड किल्ला"],
   answer: 0
 },
-  { question: "How many players are there in a cricket team?", options: ["9", "10", "11", "12"], answer: 2 },
+  { 
+  question: "कोल्हापूर जिल्ह्यातील “नरसोबाची वाडी” हे कोणत्या नदीच्या काठावर आहे?", 
+  options: ["पंचगंगा", "कृष्णा", "वारणा", "दूधगंगा"], 
+  answer: 1 
+},
+{
+  question: "‘Kanjeevaram’ साड्या कोणत्या राज्यातल्या विवाहसोहळ्यांसाठी प्रसिद्ध आहेत?",
+  options: ["कर्नाटक", "आंध्रप्रदेश", "तमिळनाडू", "केरळ"],
+  answer: 2
+},
+{
+  question: "कोल्हापुरात ‘गुळपोळी’ कोणत्या खास प्रसंगी केली जाते?",
+  options: ["गुढी पाडवा", "रथसप्तमी", "विवाहसोहळा", "नागपंचमी"],
+  answer: 1
+},
   { question: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
   { question: "Which is the largest animal on Earth?", options: ["Elephant", "Giraffe", "Blue Whale", "Shark"], answer: 2 }
 ];
@@ -195,17 +220,26 @@ const extraQuestionsJyoti = [
     options: ["7 दिवस", "15 दिवस", "30 दिवस", "60 दिवस"],
     answer: 2
   },
-  {
-  question: "स्वराज्याची पहिली व दुसरी राजधानी कोणती होती?",
-  options: [
-    "शिवनेरी व रायगड",
-    "रायगड व प्रतापगड",
-    "राजगड व रायगड",
-    "तोरणा व राजगड"
-  ],
-  answer: 2
+   {
+  question: "छत्रपती शिवाजी महाराज आणि संभाजी महाराज यांची शेवटची भेट कोणत्या किल्ल्यावर झाली होती?",
+  options: ["रायगड", "पन्हाळा", "प्रतापगड", "सिंहगड"],
+  answer: 1
 },
-  { question: "What is the boiling point of water?", options: ["90°C", "80°C", "100°C", "120°C"], answer: 2 },
+  { 
+  question: "कोल्हापूर जिल्ह्यातील प्रसिद्ध चंदोली राष्ट्रीय उद्यान कोणत्या प्राण्यासाठी ओळखले जाते?", 
+  options: ["वाघ", "काळवीट", "हत्ती", "बिबट्या"], 
+  answer: 0 
+},
+{
+  question: "‘भडंग’ हा नाश्ता कोणत्या विशिष्ट जिल्ह्याशी संबंधित मानला जातो?",
+  options: ["कोल्हापूर", "सांगली", "सातारा", "नाशिक"],
+  answer: 1
+},
+{
+  question: "‘नऊवारी साडी’ परंपरेनुसार साधारण किती मीटर लांब असते?",
+  options: ["8 मीटर", "8.2 मीटर", "9 मीटर", "9.2 मीटर"],
+  answer: 1
+},
   { question: "Which bird is known for its dance?", options: ["Peacock", "Crow", "Eagle", "Pigeon"], answer: 0 },
   { question: "Taj Mahal is located in?", options: ["Delhi", "Agra", "Mumbai", "Jaipur"], answer: 1 }
 ];
@@ -227,15 +261,30 @@ const extraQuestionsNisha = [
     answer: 1
   },
   {
-  question: "छत्रपती शिवाजी महाराज आणि संभाजी महाराज यांची शेवटची भेट कोणत्या किल्ल्यावर झाली होती?",
-  options: ["रायगड", "पन्हाळा", "प्रतापगड", "सिंहगड"],
-  answer: 1
+  question: "स्वराज्याची पहिली व दुसरी राजधानी कोणती होती?",
+  options: [
+    "शिवनेरी व रायगड",
+    "रायगड व प्रतापगड",
+    "राजगड व रायगड",
+    "तोरणा व राजगड"
+  ],
+  answer: 2
 },
-  {
-    question: "Which gas do plants absorb?",
-    options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
-    answer: 2
-  }
+  { 
+  question: "कोल्हापूरच्या ‘नवीन राजवाडा’ मध्ये आज कोणते संग्रहालय आहे?", 
+  options: ["शिवाजी महाराजांचे जीवनचरित्र", "वस्तुसंग्रहालय", "प्राणिसंग्रहालय", "हस्तकला संग्रहालय"], 
+  answer: 1 
+},
+{
+  question: "उन्हाळ्यात लोणचं खराब होऊ नये म्हणून कोणती पारंपरिक गोष्ट पाळतात?",
+  options: ["फ्रिजमध्ये ठेवतात", "काचेच्या बाटलीत साठवतात", "सूर्यप्रकाशात ठेवतात", "त्यात लिंबू पिळतात"],
+  answer: 2
+},
+{
+  question: "‘Lehenga Choli’ साठी आधुनिक काळात कोणत्या फॅब्रिकचा वापर प्रचलित आहे?",
+  options: ["रॉ सिल्क", "डेनिम", "पॉलिस्टर", "जॉर्जेट"],
+  answer: 3
+}
 ];
 
 let questions = [];
@@ -260,7 +309,7 @@ function showPlayerOptions() {
 function startGame(player) {
   document.getElementById("playerSelect").style.display = "none";
   document.getElementById("gameContainer").style.display = "block";
-  document.getElementById("bgMusic").play();
+ // document.getElementById("bgMusic").play();
 
   if (player === "shivani") {
     questions = [...baseQuestions];
@@ -327,18 +376,29 @@ function selectOption(element, index) {
   const correctIndex = questions[currentQuestion].answer;
   const allOptions = document.querySelectorAll(".option");
   allOptions.forEach(opt => opt.onclick = null);
+  const correctSound = document.getElementById("correctSound");
+  const wrongSound = document.getElementById("wrongSound");
 
-  if (index === correctIndex) {
+   if (index === correctIndex) {
     element.classList.add("correct");
+    correctSound.currentTime = 0;
+    correctSound.play();
   } else {
     element.classList.add("wrong");
     allOptions[correctIndex].classList.add("correct");
+    wrongSound.currentTime = 0;
+    wrongSound.play();
   }
 
   document.getElementById("nextBtn").style.display = "inline-block";
 }
 
 function nextQuestion() {
+  document.getElementById("correctSound").pause();
+  document.getElementById("correctSound").currentTime = 0;
+  document.getElementById("wrongSound").pause();
+  document.getElementById("wrongSound").currentTime = 0;
+  
   currentQuestion++;
   if (currentQuestion < questions.length) {
     loadQuestion();
